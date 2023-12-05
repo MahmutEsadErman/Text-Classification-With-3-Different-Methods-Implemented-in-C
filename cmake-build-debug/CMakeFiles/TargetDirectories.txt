@@ -1,0 +1,3 @@
+C:/Users/erman/Desktop/Coding/Cdersleri/textClassificationProject/cmake-build-debug/CMakeFiles/homework1.dir
+C:/Users/erman/Desktop/Coding/Cdersleri/textClassificationProject/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/erman/Desktop/Coding/Cdersleri/textClassificationProject/cmake-build-debug/CMakeFiles/rebuild_cache.dir
