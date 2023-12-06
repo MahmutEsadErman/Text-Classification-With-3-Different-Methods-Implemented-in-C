@@ -2,7 +2,7 @@
 #include <math.h>
 #include <time.h>
 #include "functionsForDictionaryAndHotVectors.h"
-#define OPFUNC 2
+#define OPFUNC 0
 
 void setValuesToArray(double* arr, double value, int length);
 double gradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors);
