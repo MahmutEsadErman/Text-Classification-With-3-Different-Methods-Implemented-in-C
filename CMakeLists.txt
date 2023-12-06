@@ -5,4 +5,4 @@ set(CMAKE_C_STANDARD 17)
 
 add_executable(homework1 main.c
         sortingArticlesbyTopics.c
-        makeDictionaryAndHotVectors.c)
+        makeDictionary.c)

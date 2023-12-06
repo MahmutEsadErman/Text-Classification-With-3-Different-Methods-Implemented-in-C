@@ -65,26 +65,7 @@ int calculateLineNumber(char* path){
     return i;
 }
 
-// Loads dictionary from a txt file
-void loadDictionary(char dictionaryFile[200], dict* dictionary){
-    dictionary->length = 0;
-    FILE* file;
-    file = fopen(dictionaryFile, "r");
-    while (fscanf(file, "%s", dictionary->items[dictionary->length].key) == 1){
-        dictionary->items[dictionary->length].value = dictionary->length;
-        dictionary->length++;
-    }
-    fclose(file);
-}
-
-// Saves vector into files
-void saveVector(FILE* file, bool* vector, int n){
-    int i;
-    for (i = 0; i < n; i++){
-        fprintf(file, "%d\n", vector[i]);
-    }
-}
-
+// Makes dictionary from a file
 void makeDictionary(FILE* file, dict* dictionary){
     char word[50];
     rewind(file);
@@ -98,6 +79,30 @@ void makeDictionary(FILE* file, dict* dictionary){
             }
         }
     }
+}
+
+// Saves dictionary to a txt file
+void saveDictionary(FILE* file, dict* dictionary){
+    int i;
+    for (i = 0; i < dictionary->length; i++){
+        if(strcmp(dictionary->items[i].key, "\0")  != 0){
+            fprintf(file, "%s\n", dictionary->items[i].key);
+        } else{
+            printf("%d)\n", i);
+        }
+    }
+}
+
+// Loads dictionary from a txt file
+void loadDictionary(char dictionaryFile[200], dict* dictionary){
+    dictionary->length = 0;
+    FILE* file;
+    file = fopen(dictionaryFile, "r");
+    while (fscanf(file, "%s", dictionary->items[dictionary->length].key) == 1){
+        dictionary->items[dictionary->length].value = dictionary->length;
+        dictionary->length++;
+    }
+    fclose(file);
 }
 
 // Makes hot vector from a file
@@ -136,10 +141,5 @@ void makeHotVector(FILE* file, dict generalDict, bool* hotVector){
         hotVector[getValue(&generalDict, words[i])] = 1;
     }
 
-    // debug
-    //printf("%s: ", words[0]);
-//    FILE* deneme;
-//    deneme = fopen("deneme.txt", "w");
-//    saveVector(deneme, hotVector, 6209);
 }
 

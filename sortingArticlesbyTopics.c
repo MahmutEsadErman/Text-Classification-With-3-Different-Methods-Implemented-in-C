@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <string.h>
+#include <ctype.h>
 
-#define MAXLENGTH 19150  // the biggest length of an articles (calculated by me)
+#define MAXLENGTH 19150  // the biggest length of an articles (calculated by me using)
 
 int main() {
     FILE *input;
@@ -13,7 +13,7 @@ int main() {
     int i;
 
     // Reading
-    input = fopen("dataset/news/Articlestxt.txt", "r");
+    input = fopen("dataset/news/Articles.txt", "r");
     business = fopen("dataset/news/business.txt", "w");
     sport = fopen("dataset/news/sport.txt", "w");
 
@@ -22,14 +22,17 @@ int main() {
         return 1;
     }
 
+    // Sorting and omitting non-letter characters
     while ((c = fgetc(input)) != EOF) {
-
-
         if(c == '\"'){
             i = 0;
             while ((c = fgetc(input)) != '\"'){
                 label:
-                article[i] = c;
+                if( isalpha( c ))
+                    article[i] = c;
+                else{
+                    article[i] = ' ';
+                }
                 i++;
             }
             if((c = fgetc(input)) == ','){
@@ -56,5 +59,7 @@ int main() {
     fclose(input);
     fclose(business);
     fclose(sport);
+
+    printf("Sorting Completed!");
     return 0;
 }

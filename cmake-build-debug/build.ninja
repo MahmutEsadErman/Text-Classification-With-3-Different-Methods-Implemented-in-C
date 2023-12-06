@@ -61,8 +61,8 @@ build CMakeFiles/homework1.dir/sortingArticlesbyTopics.c.obj: C_COMPILER__homewo
   OBJECT_DIR = CMakeFiles\homework1.dir
   OBJECT_FILE_DIR = CMakeFiles\homework1.dir
 
-build CMakeFiles/homework1.dir/makeDictionaryAndHotVectors.c.obj: C_COMPILER__homework1_unscanned_Debug C$:/Users/erman/Desktop/Coding/Cdersleri/textClassificationProject/makeDictionaryAndHotVectors.c || cmake_object_order_depends_target_homework1
-  DEP_FILE = CMakeFiles\homework1.dir\makeDictionaryAndHotVectors.c.obj.d
+build CMakeFiles/homework1.dir/makeDictionary.c.obj: C_COMPILER__homework1_unscanned_Debug C$:/Users/erman/Desktop/Coding/Cdersleri/textClassificationProject/makeDictionary.c || cmake_object_order_depends_target_homework1
+  DEP_FILE = CMakeFiles\homework1.dir\makeDictionary.c.obj.d
   FLAGS = -g -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\homework1.dir
   OBJECT_FILE_DIR = CMakeFiles\homework1.dir
@@ -75,7 +75,7 @@ build CMakeFiles/homework1.dir/makeDictionaryAndHotVectors.c.obj: C_COMPILER__ho
 #############################################
 # Link the executable homework1.exe
 
-build homework1.exe: C_EXECUTABLE_LINKER__homework1_Debug CMakeFiles/homework1.dir/main.c.obj CMakeFiles/homework1.dir/sortingArticlesbyTopics.c.obj CMakeFiles/homework1.dir/makeDictionaryAndHotVectors.c.obj
+build homework1.exe: C_EXECUTABLE_LINKER__homework1_Debug CMakeFiles/homework1.dir/main.c.obj CMakeFiles/homework1.dir/sortingArticlesbyTopics.c.obj CMakeFiles/homework1.dir/makeDictionary.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\homework1.dir

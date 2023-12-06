@@ -8,6 +8,7 @@ int main() {
     FILE *training;
     FILE *test;
 
+    // Splitting group1 samples
     topic = fopen("dataset/news/business.txt", "r");
     training = fopen("dataset/businessTraining.txt", "w");
     test = fopen("dataset/businessTest.txt", "w");
@@ -18,6 +19,7 @@ int main() {
     fclose(training);
     fclose(test);
 
+    // Splitting group2 samples
     topic = fopen("dataset/news/sport.txt", "r");
     training = fopen("dataset/sportTraining.txt", "w");
     test = fopen("dataset/sportTest.txt", "w");
@@ -28,7 +30,7 @@ int main() {
     fclose(training);
     fclose(test);
 
-    printf("Your data splitted into two parts");
+    printf("Your data is splitted into two parts.");
 
     return 0;
 }
