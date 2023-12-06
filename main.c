@@ -2,14 +2,17 @@
 #include <math.h>
 #include <time.h>
 #include "functionsForDictionaryAndHotVectors.h"
-#define OPFUNC 0
+
+#define OPFUNC 2
+#define STARTW 0
 
 void setValuesToArray(double* arr, double value, int length);
 double gradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors);
-double stochasticGradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors);
+double stochasticGradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors,int stoch_size);
 double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictlength,double* weights,bool ** hotvectors,double b1 ,double b2 ,int stoch_size);
 
 double test(bool** hotVectors, double* weights, int dictLength, int exampleNumber);
+void saveStatistics(char* path, double loss, double succesRate, double duration);
 
 double function(double wx){
     return tanh(wx);
@@ -40,15 +43,15 @@ int main() {
     char* group2_training_filePath = "dataset/sportTraining.txt";
     char* group1_test_filePath = "dataset/businessTest.txt";
     char* group2_test_filePath = "dataset/sportTest.txt";
+    char* outputFilePath = "dataset/statistics.txt";
     bool** trainingHotVectors;
     bool** testHotVectors;
     double* weights;
+    clock_t start_time, end_time;
     FILE* group1TrainingFile;
     FILE* group2TrainingFile;
     FILE* group1TestFile;
     FILE* group2TestFile;
-
-    srand(time(NULL));
 
     // Loading Dictionary
     loadDictionary("dataset/dictionary.txt", &dictionary);
@@ -93,13 +96,13 @@ int main() {
     }
 
     //Training
-    setValuesToArray(weights, 0, dictionary.length);
+    setValuesToArray(weights, STARTW, dictionary.length);
     double step_size = 0.01;
     int epochs = 100;
-    double B1= 0.5;
-    double B2= 0.7;
+    double B1= 0.9;
+    double B2= 0.99;
     int stoch_size = 10;
-    int startTime = (int)time(NULL);
+    start_time = clock();
 
     switch (OPFUNC)
     {
@@ -107,7 +110,7 @@ int main() {
         gradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
         break;
     case 1:
-        stochasticGradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
+        stochasticGradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors,stoch_size);
         break;
     case 2:
         ADAM(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors,B1 ,B2,stoch_size);
@@ -115,9 +118,7 @@ int main() {
         break;
     }
 
-    
-
-    printf("duration: %d\n", (int)time(NULL)-startTime);
+    printf("duration: %.2f\n", (double)(clock()-start_time) / CLOCKS_PER_SEC * 1000);
 
     // Testing
     test(testHotVectors, weights, dictionary.length, numberOfTestExamples);
@@ -139,20 +140,34 @@ void setValuesToArray(double* arr, double value, int length){
 
 double gradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors){
     int i,j,epoch, y;
-    double loss;
-    double dp;
+    double loss,gt;
+    double *dp;
+    dp = malloc(exampleNumber*sizeof(double));
     for (epoch = 0; epoch < maxIter; epoch++) {
         loss = 0;
-        y = -1;
+        
+        
         for (i = 0; i < exampleNumber; i++) {
-            dp = dotProduct(weights, hotVectors[i], dictLength);
+            dp[i] = dotProduct(weights, hotVectors[i], dictLength);
+        }
+        for (j = 0; j < dictLength; j++) {
+            gt=0;
+            y = -1;
+            for (i = 0; i < exampleNumber; i++) {
+                if(y == 1) y = -1;
+                else y = 1;
+                gt+=lossFunction_der(dp[i], y, hotVectors[i][j]);
+            }
+            gt/=exampleNumber;
+            // Gradient Descent
+            weights[j] -= learning_rate * gt;
+        }
+        y=-1;
+        for(i=0;i<exampleNumber; i++){
             if(y == 1) y = -1;
             else y = 1;
-            // Gradient Descent
-            for (j = 0; j < dictLength; j++) {
-                weights[j] -= learning_rate * lossFunction_der(dp, y, hotVectors[i][j]);
-            }
-            loss += lossFunction(y, function(dp));
+            dp[i] = dotProduct(weights, hotVectors[i], dictLength);
+            loss += lossFunction(y, function(dp[i]));
         }
         loss /= exampleNumber;
         printf("Epoch: %d, Loss: %f\n", epoch+1, loss);
@@ -160,25 +175,32 @@ double gradientDescent(int maxIter, int exampleNumber, double learning_rate, int
     return loss;
 }
 
-double stochasticGradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors){
+double stochasticGradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors,int stoch_size){
     int i,j,epoch,y;
     double loss;
-    double dp;
     int start, end;
+    double *dp;
+    int * random_num;
+    random_num = malloc(stoch_size*sizeof(int));
+    dp = malloc(exampleNumber*sizeof(double));
     for (epoch = 0; epoch < maxIter; epoch++) {
-        end = rand() % dictLength+1;
-        start = rand() % end+1;
         loss = 0;
-        y = -1;
-        for (i = 0; i < exampleNumber; i++) {
-            dp = dotProduct(weights, hotVectors[i], dictLength);
-            if(y == 1) y = -1;
-            else y = 1;
-            // SGradient Descent
-            for (j = start; j < end; j++) {
-                weights[j] -= learning_rate * lossFunction_der(dp, y, hotVectors[i][j]);
+        
+        for (i=0; i<stoch_size; i++){
+            random_num[i] = rand() % exampleNumber;
+            dp[i] = dotProduct(weights, hotVectors[random_num[i]], dictLength);
+        }
+        for (j = 0; j < dictLength; j++) {
+            for (i = 0; i < stoch_size; i++) {
+                y= (random_num[i]%2) *(-2) +1 ;
+                // SGradient Descent
+                weights[j] -= learning_rate * lossFunction_der(dp[i], y, hotVectors[random_num[i]][j]);
             }
-            loss += lossFunction(y, function(dp));
+        }
+        for(i=0;i<stoch_size; i++){
+            y= (random_num[i]%2) *(-2) +1 ;
+            dp[i] = dotProduct(weights, hotVectors[random_num[i]], dictLength);
+            loss += lossFunction(y, function(dp[i]));
         }
         loss /= exampleNumber;
         printf("Epoch: %d, Loss: %f\n", epoch+1, loss);
@@ -191,27 +213,27 @@ double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictLength
     double loss;
     double * dp;
     double *mt,*vt,gt,eps=0.0000001;
-    int  * rnd;
-    rnd = malloc(stoch_size*sizeof(int));
-    dp = malloc(stoch_size*sizeof(int));
+    int  * random_num;
+    random_num = malloc(stoch_size*sizeof(int));
+    dp = malloc(stoch_size*sizeof(double));
     mt = calloc(dictLength,sizeof(double));
     vt= calloc(dictLength,sizeof(double));
     for (epoch = 0; epoch < maxIter; epoch++) {
         
         loss = 0;
         for (i=0; i<stoch_size; i++){
-            rnd[i] = rand() % exampleNumber;
-            dp[i] = dotProduct(weights, hotVectors[rnd[i]], dictLength);
+            random_num[i] = rand() % exampleNumber;
+            dp[i] = dotProduct(weights, hotVectors[random_num[i]], dictLength);
         }
         for (j = 0; j < dictLength; j++) {
             for (i = 0; i < stoch_size; i++) {
-                y= (rnd[i]%2) *2 +1 ;
-                // ADAM
-                gt+=lossFunction_der(dp[i], y, hotVectors[i][j]);
+                y= (random_num[i]%2) *(-2) +1 ;
+                
+                gt+=lossFunction_der(dp[i], y, hotVectors[random_num[i]][j]);
                 
             }
             gt /= stoch_size;
-
+            // ADAM
             mt[j]=mt[j]*b1 + (1-b1) * gt;
             vt[j]= vt[j]*b2 + (1-b2) * gt * gt;
             weights[j] -= learning_rate * (mt[j]/(1-pow(b1,epoch+1))) / pow((vt[j]/(1-pow(b2,epoch+1)) )+ eps,0.5);
@@ -219,15 +241,15 @@ double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictLength
         }
        
         for (i=0; i<stoch_size; i++){
-            y= (rnd[i]%2) *2 -1 ;
-            dp[i] = dotProduct(weights, hotVectors[rnd[i]], dictLength);
+            y= (random_num[i]%2) *(-2) +1 ;
+            dp[i] = dotProduct(weights, hotVectors[random_num[i]], dictLength);
             loss += lossFunction(y, function(dp[i]));
         }
         loss /= stoch_size;
         printf("Epoch: %d, Loss: %f\n", epoch+1, loss);
     }
     free(dp);
-    free(rnd);
+    free(random_num);
     free(mt);
     free(vt);
     return loss;
@@ -250,3 +272,8 @@ double test(bool** hotVectors, double* weights, int dictLength, int exampleNumbe
     printf("Your model is %.2f percent successful!!\n", successRate*100);
     return successRate;
 }
+
+void saveStatistics(char* path, double loss, double succesRate, double duration){
+
+}
+
