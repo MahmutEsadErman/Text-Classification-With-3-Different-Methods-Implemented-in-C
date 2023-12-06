@@ -2,10 +2,12 @@
 #include <math.h>
 #include <time.h>
 #include "functionsForDictionaryAndHotVectors.h"
+#define OPFUNC 0
 
 void setValuesToArray(double* arr, double value, int length);
 double gradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors);
 double stochasticGradientDescent(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors);
+double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictlength,double* weights,bool ** hotvectors,int b1 ,int b2 );
 
 double test(bool** hotVectors, double* weights, int dictLength, int exampleNumber);
 
@@ -94,11 +96,25 @@ int main() {
     setValuesToArray(weights, 0, dictionary.length);
     double step_size = 0.01;
     int epochs = 100;
+    double B1= 0.9;
+    double B2= 0.7;
     int startTime = (int)time(NULL);
 
-    //gradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
+    switch (OPFUNC)
+    {
+    case 0:
+        gradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
+        break;
+    case 1:
+        stochasticGradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
+        break;
+    case 2:
+        ADAM(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors,B1 ,B2);
+    default:
+        break;
+    }
 
-    stochasticGradientDescent(epochs, numberOfTrainingExamples, step_size, dictionary.length, weights, trainingHotVectors);
+    
 
     printf("duration: %d\n", (int)time(NULL)-startTime);
 
@@ -169,7 +185,10 @@ double stochasticGradientDescent(int maxIter, int exampleNumber, double learning
     return loss;
 }
 
-double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors, int y){
+double ADAM(int maxIter, int exampleNumber, double learning_rate, int dictLength, double* weights, bool** hotVectors, int b1,int b2){
+    int i,j,epoch;
+    
+    
     return 0;
 }
 
