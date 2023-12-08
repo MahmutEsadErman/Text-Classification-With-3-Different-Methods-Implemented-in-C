@@ -4,3 +4,5 @@
 3) ADAM
 
 to see the plots you can look at "grapich design hub.ipynb" file.
+
+source of the dataset: https://www.kaggle.com/datasets/asad1m9a9h6mood/news-articles
