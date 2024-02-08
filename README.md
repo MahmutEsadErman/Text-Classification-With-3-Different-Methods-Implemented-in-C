@@ -9,7 +9,7 @@ to see the all plots you can look at "plots.ipynb" file.
 
 ## Some Plots
 ![image](https://github.com/MahmutEsadErman/Text-Classification-With-3-Different-Methods-Implemented-in-C/assets/103488550/7e4e7cbf-def8-4d13-b3dd-70bfefc3debc)
-![image](https://github.com/MahmutEsadErman/Text-Classification-With-3-Different-Methods-Implemented-in-C/assets/103488550/dda7862d-1c5e-46a5-8254-50625b94f491)
+![image](https://github.com/MahmutEsadErman/Text-Classification-With-3-Different-Methods-Implemented-in-C/assets/103488550/423d7522-b8b1-439e-95b0-832fdc067d2d)
 
 ## Result
 In the light of this project, there are some conclusion that we draw. One of them is even though in the stochastic gradient descent we are using less sample in each training it is faster and most of the time it is more accurate. The other is ADAM method is more efficient than the rest. 
